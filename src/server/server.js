@@ -21,15 +21,11 @@ app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output
 app.use(webpackHotMiddleware(compiler));
 
 const renderFullPage = html => {
-  const initialState = {};
   return `
   <!doctype html>
   <html lang="utf-8">
     <head>
-      <title>React/MobX boilerplate</title>
-      <script>
-        window.initialState= ${JSON.stringify(initialState)}
-      </script>
+      <title>Codeflow Chat</title>
     </head>
     <body>
       <section id="app"><div>${html}</div></section>
@@ -44,17 +40,14 @@ app.use(bodyParser.json());
 app.use(logger('dev'));
 
 //Root
-app.get('/', function(req, res) {
+app.get('*', function(req, res) {
   const initView = renderToString((
     <App />
   ));
   const page = renderFullPage(initView);
   res.status(200).send(page);
 })
-//404 handler
-app.get('*', function(req, res) {
-  res.status(404).send('404 not found.')
-});
+
 //global error catcher
 app.use((err, req, res, next) => {
   console.error("Error on request %s %s", req.method, req.url);
@@ -69,4 +62,3 @@ process.on('uncaughtException', evt => {
 app.listen(3000, function(){
   console.log('Listening on port 3000');
 });
-

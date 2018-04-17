@@ -1,6 +1,6 @@
 import React from 'react';
-import {observer} from 'mobx-react';
-
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react';
 import DevTool from 'mobx-react-devtools';
 
 @observer
@@ -9,8 +9,7 @@ export default class App extends React.Component {
     return (
       <div>
         <DevTool />
-        <h1>Hello from App Component!</h1>
-        {this.props.children}
+        <h1>{JSON.stringify(toJS(this.props.state))}</h1>
       </div>
     );
   }
