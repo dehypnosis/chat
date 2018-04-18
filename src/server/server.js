@@ -77,8 +77,8 @@ if (process.env.NODE_ENV != 'production') {
     fs.readdirSync(__dirname).forEach(file => {
       delete require.cache[require.resolve(`./${file}`)];
     });
-    return require('./socket').default.apply(null, args);
+    return require('./socket').default(io).apply(null, args);
   });
 } else {
-  io.on('connection', require('./socket').default);
+  io.on('connection', require('./socket').default(io));
 }

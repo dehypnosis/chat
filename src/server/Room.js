@@ -1,6 +1,20 @@
 class Room {
   static instances = [];
 
+  static clearEmptyRooms() {
+    const at = parseInt((new Date()).getTime()/1000) - 60*60; // 60min ago
+    for (let i = 0; i < Room.instances.length; i++) {
+      let room = Room.instances[i];
+      if (room.users.length > 0) continue;
+
+      const lastMessage = room.messages[room.messages.length - 1];
+      if (!lastMessage || lastMessage.at < at) {
+        Room.instances.splice(i, 1);
+        i--;
+      }
+    }
+  }
+
   static create(args) {
     return new Room(args);
   }
@@ -29,6 +43,22 @@ class Room {
     return null;
   }
 
+  static message({ id, user, content }) {
+    const room = Room.instances.find(room => room.id == id);
+    if (room) {
+      const message = {
+        id: (room.messages[room.messages.length - 1] || { id: 0}).id + 1,
+        user,
+        content,
+        at: parseInt((new Date()).getTime()/1000),
+      };
+      room.messages = room.messages.slice(-9).concat(message);
+
+      return message;
+    }
+    return null;
+  }
+
   constructor({ title, user }) {
     this.id = Room.instances.length + 1; // count from 1
     this.title = title;
@@ -43,5 +73,6 @@ if (!global.ROOM_INSTANCES) {
   global.ROOM_INSTANCES = [];
 }
 Room.instances = global.global.ROOM_INSTANCES;
+
 
 export default Room;

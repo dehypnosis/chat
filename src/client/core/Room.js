@@ -6,14 +6,16 @@ class Room {
   @observable users = [];
   @observable messages = [];
 
-  @action update = ({ title, users, messages }) => {
+  @action update = ({ title, users, message, messages }) => {
     if (title) this.title = title;
     if (users) this.users = users.map(userData => new User(userData));
-    if (messages) this.messages = messages.map(messageData => new Message(messageData));
-  }
-
-  @action appendMessage = (messageData = {}) => {
-    this.messages = [...this.messages, new Message(messageData)]
+    if (message) this.messages.push(new Message(message));
+    if (messages) {
+      const currentLastMessage = this.messages[this.messages.length - 1] || { id: -1 };
+      this.messages = this.messages.concat(
+        messages.filter(message => message.id > currentLastMessage.id).map(message => new Message(message))
+      );
+    }
   }
 
   constructor({ id, title, users, messages }) {

@@ -4,10 +4,20 @@ import { Card, Header, Form, Button, Input, Image, Dimmer, Loader, Feed, List } 
 
 @observer
 export default class Room extends React.Component {
-  state = { message: null, loading: false, sending: false };
+  state = { messageContent: null, loading: false, messaging: false };
+  lastMessagesCount = 0;
 
   componentDidMount() {
     this.inputMessageInputRef.focus()
+    this.scrollMessagesContainerToBottom();
+  }
+
+  componentDidUpdate() {
+    const messagesCount = this.props.room ? this.props.room.messages.length : 0;
+    if (this.lastMessagesCount < messagesCount) {
+      this.lastMessagesCount = messagesCount;
+      this.scrollMessagesContainerToBottom();
+    }
   }
 
   scrollMessagesContainerToBottom = () => {
@@ -24,37 +34,30 @@ export default class Room extends React.Component {
     this.messagesContainerRef.scrollTo(0, this.messagesContainerRef.scrollHeight);
   }
 
-  setMessage = (message) => {
-    this.setState(state => ({...state, message}))
+  setMessageContent = (messageContent) => {
+    this.setState(state => ({...state, messageContent}))
   }
 
   submit = (e) => {
     e.preventDefault();
 
-    if (this.state.sending) return;
+    if (this.state.messaging) return;
 
-    const message = this.state.message && this.state.message.trim();
-    if (!message) return;
+    const content = this.state.messageContent && this.state.messageContent.trim();
+    if (!content) return;
 
-    this.setState(state => ({...state, sending: true}));
+    this.setState(state => ({...state, messaging: true}));
 
-    // TODO: send message to server
-    setTimeout(() => {
-      this.props.room.appendMessage({
-        id: this.props.room.messages.length + 1000,
-        user: JSON.parse(JSON.stringify(this.props.user)),
-        content: message,
-        at: parseInt((new Date).getTime()/1000),
+    this.props.message({ content })
+      .then(() => {
+        this.setState(state => ({...state, messageContent: null}))
+        this.inputMessageInputRef.focus();
+
+        // forbide too much talker
+        setTimeout(() => {
+          this.setState(state => ({...state, messaging: false}))
+        }, 250)
       })
-      this.setState(state => ({...state, message: null}))
-      this.scrollMessagesContainerToBottom();
-      this.inputMessageInputRef.focus();
-
-      // forbide too much talker
-      setTimeout(() => {
-        this.setState(state => ({...state, sending: false}))
-      }, 500)
-    }, 200);
   }
 
   render() {
@@ -90,11 +93,11 @@ export default class Room extends React.Component {
                       <Feed.Event
                         key={message.id}
                       >
-                        <Feed.Label image={message.user.avatarUrl} />
+                        {message.user && <Feed.Label image={message.user.avatarUrl} />}
                         <Feed.Content>
                           <Feed.Summary>
-                            {message.user.nickname}
-                            <Feed.Date>{message.at.toLocaleString()}</Feed.Date>
+                            {message.user  ? message.user.nickname : '시스템'}
+                            {message.at && <Feed.Date>{message.at.toLocaleString()}</Feed.Date>}
                           </Feed.Summary>
                           <Feed.Extra text>{message.content}</Feed.Extra>
                         </Feed.Content>
@@ -127,8 +130,8 @@ export default class Room extends React.Component {
                   size='large'
                   ref={ref => this.inputMessageInputRef = ref}
                   placeholder='메세지를 입력하세요.'
-                  value={this.state.message}
-                  onChange={e => this.setMessage(e.target.value)}
+                  value={this.state.messageContent}
+                  onChange={e => this.setMessageContent(e.target.value)}
                   disabled={this.state.loading}
                 />
               </form>

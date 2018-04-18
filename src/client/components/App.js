@@ -35,6 +35,7 @@ export default class App extends React.Component {
           roomId={state.activeRoomId}
           room={state.activeRoom}
           leave={socket.leaveRoom}
+          message={socket.messageToRoom}
         />
       )
     }
