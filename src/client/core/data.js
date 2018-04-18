@@ -46,19 +46,4 @@ const dummyMessages = [
   },
 ]
 
-const dummyRooms = [
-  {
-    id: 1,
-    title: '테스트 방1',
-    users: dummyUsers.slice(0,2),
-    messages: dummyMessages.slice(0,2),
-  },
-  {
-    id: 2,
-    title: '테스트 방2',
-    users: dummyUsers,
-    messages: dummyMessages,
-  },
-];
-
-export { avatarUrls, dummyRooms };
+export { avatarUrls };

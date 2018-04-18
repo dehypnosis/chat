@@ -21,7 +21,7 @@ export default class App extends React.Component {
         <Lobby
           user={state.user}
           rooms={state.rooms}
-          setRooms={state.setRooms}
+          fetchRooms={socket.fetchRooms}
           setActiveRoomId={state.setActiveRoomId}
         />
       )

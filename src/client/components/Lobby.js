@@ -1,18 +1,19 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { Card, Header, Form, Button, Input, Image, Dimmer, Loader, List } from 'semantic-ui-react';
-import { dummyRooms } from '../core/data';
 
 @observer
 export default class Lobby extends React.Component {
   state = { loading: true, creatingRoom: false, roomTitle: null };
 
   componentDidMount() {
-    // TODO: fetch rooms
-    setTimeout(() => {
-      this.props.setRooms(dummyRooms)
-      this.setState(state => ({...state, loading: false}))
-    }, 500)
+    this.props.fetchRooms()
+      .then(() => {
+        this.setState(state => ({...state, loading: false}))
+        if (this.props.rooms.length == 0) {
+          this.roomTitleInputRef.focus();
+        }
+      })
   }
 
   enterRoom = (room) => {
@@ -58,9 +59,9 @@ export default class Lobby extends React.Component {
                     </List.Content>
                   </List.Item>
                 )) : (
-                  <List.Item>
+                  <List.Item style={{cursor: 'default', background: 'none'}}>
                     <List.Content>
-                      <List.Description style={{cursor: 'default', background: 'none'}}>개설된 채팅방이 없습니다.</List.Description>
+                      <List.Description>개설된 채팅방이 없습니다.</List.Description>
                     </List.Content>
                   </List.Item>
                 )}
@@ -70,6 +71,7 @@ export default class Lobby extends React.Component {
                 <form onSubmit={this.createRoom}>
                   <Input
                     fluid
+                    ref={ref => this.roomTitleInputRef = ref}
                     size='large'
                     action={{content: '개설하기', color: !this.state.loading && rooms.length == 0 ? 'blue' : null}}
                     placeholder='또는 개설 할 채팅방의 제목을 입력하세요.'

@@ -23,6 +23,19 @@ class Socket {
       })
     })
   }
+
+  fetchRooms = () => {
+    return new Promise((resolve, reject) => {
+      console.log('fetchRooms')
+      this.io.emit('fetchRooms');
+
+      this.io.once('rooms', (roomsData) => {
+        console.log('rooms', roomsData);
+        this.state.setRooms(roomsData);
+        resolve();
+      })
+    })
+  }
 }
 
 export default Socket;
