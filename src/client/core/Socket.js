@@ -10,7 +10,7 @@ class Socket {
     return new Promise((resolve, reject) => {
 
       // connect to ws server
-      console.log('login')
+      console.log('login', { nickname, avatarUrl })
       this.io = io(window.location.origin, {
         query: { nickname, avatarUrl },
       });
@@ -39,13 +39,45 @@ class Socket {
 
   createRoom = ({ title }) => {
     return new Promise((resolve, reject) => {
-      console.log('createRoom')
+      console.log('createRoom', { title })
       this.io.emit('createRoom', { title })
 
       this.io.once('room', (roomData) => {
         console.log('createRoom -> room', roomData);
         this.state.createRoom(roomData);
+
+        this.io.on('room', (roomData) => {
+          console.log('room', roomData);
+          this.state.updateActiveRoom(roomData);
+        })
       })
+    })
+  }
+
+  enterRoom = ({ id }) => {
+    return new Promise((resolve, reject) => {
+      console.log('enterRoom', { id })
+      this.io.emit('enterRoom', { id })
+
+      this.io.once('room', (roomData) => {
+        console.log('enterRoom -> room', roomData);
+        this.state.setActiveRoomId(id);
+        this.state.updateActiveRoom(roomData);
+
+        this.io.on('room', (roomData) => {
+          console.log('room', roomData);
+          this.state.updateActiveRoom(roomData);
+        })
+      })
+    })
+  }
+
+  leaveRoom = () => {
+    return new Promise((resolve, reject) => {
+      console.log('leaveRoom')
+      this.io.emit('leaveRoom');
+      this.io.off('room');
+      this.state.setActiveRoomId(null);
     })
   }
 }

@@ -23,7 +23,7 @@ export default class App extends React.Component {
           rooms={state.rooms}
           fetchRooms={socket.fetchRooms}
           createRoom={socket.createRoom}
-          enterRoomById={id => state.setActiveRoomId(id)}
+          enterRoomById={id => socket.enterRoom({ id })}
         />
       )
 
@@ -33,8 +33,7 @@ export default class App extends React.Component {
           user={state.user}
           roomId={state.activeRoomId}
           room={state.activeRoom}
-          update={state.updateActiveRoom}
-          exit={() => state.setActiveRoomId(null)}
+          leave={socket.leaveRoom}
         />
       )
     }

@@ -27,6 +27,7 @@ const renderFullPage = html => {
     <head>
       <title>Codeflow Chat</title>
       <link rel="stylesheet" href="/static/bundle.css" />
+      <meta name="viewport" content="width=device-width, user-scalable=no">
     </head>
     <body>
       <section id="app"><div>${html}</div></section>

@@ -6,10 +6,16 @@ html {
 
 #app {
   height: 100vh;
+  @media (max-width: 650px) {
+    height: calc(~"100vh - 60px")
+  }
   overflow: hidden;
   padding: 1em;
   & > div {
     height: calc(~"100vh - 2em");
+    @media (max-width: 650px) {
+      height: calc(~"100vh - 2em - 60px");
+    }
     overflow: hidden;
   }
 }

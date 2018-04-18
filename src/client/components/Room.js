@@ -4,17 +4,10 @@ import { Card, Header, Form, Button, Input, Image, Dimmer, Loader, Feed, List } 
 
 @observer
 export default class Room extends React.Component {
-  state = { message: null, loading: true, sending: false };
+  state = { message: null, loading: false, sending: false };
 
   componentDidMount() {
-    // TODO: fetch room by this.props.roomId and update room data by this.props.update
-    // TODO: listen to server message event and append messages by this.props.appendMessage
-    // TODO: listen to server users update event and update users by this.props.update
-    setTimeout(() => {
-      this.setState(state => ({...state, loading: false}))
-      this.inputMessageInputRef.focus()
-      // this.props.update( ... )
-    }, 500);
+    this.inputMessageInputRef.focus()
   }
 
   scrollMessagesContainerToBottom = () => {
@@ -55,6 +48,7 @@ export default class Room extends React.Component {
       })
       this.setState(state => ({...state, message: null}))
       this.scrollMessagesContainerToBottom();
+      this.inputMessageInputRef.focus();
 
       // forbide too much talker
       setTimeout(() => {
@@ -76,7 +70,7 @@ export default class Room extends React.Component {
               content={
                 !room ? '...' : (
                   <div>
-                    <Button style={{position: 'absolute', right: '0'}} compact size='mini' onClick={this.props.exit}>나가기</Button>
+                    <Button style={{position: 'absolute', right: '0'}} compact size='mini' onClick={this.props.leave}>나가기</Button>
                     <span>{room.title}</span>
                   </div>
                 )

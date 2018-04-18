@@ -7,6 +7,15 @@ export default class Lobby extends React.Component {
   state = { loading: true, creatingRoom: false, roomTitle: null };
 
   componentDidMount() {
+    this.fetchRoomsInterval = setInterval(this.fetchRooms, 5000);
+    this.fetchRooms();
+  }
+
+  componentWillUnmount() {
+    if (this.fetchRoomsInterval) clearInterval(this.fetchRoomsInterval);
+  }
+
+  fetchRooms = () => {
     this.props.fetchRooms()
       .then(() => {
         this.setState(state => ({...state, loading: false}))
@@ -25,7 +34,8 @@ export default class Lobby extends React.Component {
 
     const title = this.state.roomTitle && this.state.roomTitle.trim();
 
-    if (this.state.creatingRoom || !title) return;
+    if (this.state.creatingRoom || !title) return this.roomTitleInputRef.focus();
+
     this.setState(state => ({...state, creatingRoom: true}))
     this.props.createRoom({ title });
   }
