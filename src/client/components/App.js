@@ -22,7 +22,8 @@ export default class App extends React.Component {
           user={state.user}
           rooms={state.rooms}
           fetchRooms={socket.fetchRooms}
-          setActiveRoomId={state.setActiveRoomId}
+          createRoom={socket.createRoom}
+          enterRoomById={id => state.setActiveRoomId(id)}
         />
       )
 

@@ -36,6 +36,18 @@ class Socket {
       })
     })
   }
+
+  createRoom = ({ title }) => {
+    return new Promise((resolve, reject) => {
+      console.log('createRoom')
+      this.io.emit('createRoom', { title })
+
+      this.io.once('room', (roomData) => {
+        console.log('createRoom -> room', roomData);
+        this.state.createRoom(roomData);
+      })
+    })
+  }
 }
 
 export default Socket;

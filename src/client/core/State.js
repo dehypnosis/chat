@@ -25,16 +25,15 @@ class State {
   }
 
   @action updateActiveRoom = (roomData = {}) => {
-    if (!this.activeRoomId) return;
-
-    // existing room
     if (this.activeRoom) {
       this.activeRoom.update(roomData);
-
-    // newly created room
-    } else {
-      this.rooms = [...this.rooms, new room(roomData)];
     }
+  }
+
+  @action createRoom = (roomData = {}) => {
+    const room = new Room(roomData);
+    this.rooms = [...this.rooms, room];
+    this.activeRoomId = room.id;
   }
 
   constructor({ activeRoomId = null } = {}) {

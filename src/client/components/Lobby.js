@@ -17,15 +17,17 @@ export default class Lobby extends React.Component {
   }
 
   enterRoom = (room) => {
-    this.props.setActiveRoomId(room.id);
+    this.props.enterRoomById(room.id);
   }
 
   createRoom = (e) => {
     e.preventDefault();
 
-    if (this.state.creatingRoom) return;
+    const title = this.state.roomTitle && this.state.roomTitle.trim();
+
+    if (this.state.creatingRoom || !title) return;
     this.setState(state => ({...state, creatingRoom: true}))
-    // TODO: create room and enter room
+    this.props.createRoom({ title });
   }
 
   setRoomTitle = (roomTitle) => {

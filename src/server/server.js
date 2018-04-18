@@ -69,9 +69,13 @@ server.listen(3000, function(){
 });
 
 if (process.env.NODE_ENV != 'production') {
+  const fs = require('fs');
   io.on('connection', function(...args) {
     // Dynamically reload socket handler for fast deveolpment environment
-    delete require.cache[require.resolve('./socket')];
+    // Invalidate all cached module in current directory
+    fs.readdirSync(__dirname).forEach(file => {
+      delete require.cache[require.resolve(`./${file}`)];
+    });
     return require('./socket').default.apply(null, args);
   });
 } else {
