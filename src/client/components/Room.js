@@ -39,7 +39,7 @@ export default class Room extends React.Component {
 
     return (
       <div className='chat-room'>
-        <h1>{this.state.loading ? '불러오는 중...' : room && room.title }</h1>
+        <h1>{this.state.loading && !room ? '불러오는 중...' : room && room.title }</h1>
         <div className='chat-room-messages'>
           <ul>
             {room && room.messages.map(message => (

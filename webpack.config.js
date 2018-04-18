@@ -1,8 +1,10 @@
 var path    = require('path');
 var webpack = require('webpack');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+var __DEV__ = process.env.NODE_ENV == 'development';
 
 module.exports = {
-  devtool: 'eval',
   entry: [
     'webpack-hot-middleware/client',
     './src/client/client'
@@ -14,7 +16,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
+    new ExtractTextPlugin('bundle.css'),
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
       __CLIENT__: JSON.stringify(true),
@@ -22,13 +24,26 @@ module.exports = {
     }),
   ],
   resolve: {
-    extensions: ['', '.js', 'jsx']
+    extensions: ['.js', 'jsx']
   },
   module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      loaders: ['babel'],
-      exclude: /(node_modules)/,
-    }]
+    rules: [
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader',
+        })
+      },
+      {
+        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+        loader: 'url-loader?limit=100000'
+      },
+      {
+        test: /\.jsx?$/,
+        loaders: ['babel-loader'],
+        exclude: /(node_modules)/,
+      },
+    ],
   }
 };
