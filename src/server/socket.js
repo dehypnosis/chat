@@ -1,5 +1,7 @@
 import Room from './Room';
 
+const LOBBY_ROOM_ID = 'LOBBY';
+
 export default function socketHandler(socket) {
 
   // 1: login (connected) -> emit logined with userData
@@ -7,9 +9,16 @@ export default function socketHandler(socket) {
   const user = { id: socket.id, nickname, avatarUrl };
   socket.emit('logined', { user });
 
-  // 2: fetchRooms -> emit rooms with roomsData
-  socket.on('fetchRooms', () => {
-    socket.emit('rooms', Room.instances);
+  // 2: enterLobby -> join LOBBY channel, and initially emit rooms with roomsData
+  socket.on('enterLobby', () => {
+    socket.join(LOBBY_ROOM_ID, () => {
+      socket.emit('rooms', Room.instances);
+    })
+  })
+
+  // 2.5: leaveLobby -> leave LOBBY channel
+  socket.on('leaveLobby', () => {
+    socket.leave(LOBBY_ROOM_ID);
   })
 
   // 3: createRoom -> emit room with RoomData
@@ -18,6 +27,7 @@ export default function socketHandler(socket) {
     if (room) {
       socket.join(room.id, () => {
         socket.emit('room', room)
+        socket.to(LOBBY_ROOM_ID).emit('rooms', Room.instances);
       })
     }
   })
@@ -28,7 +38,8 @@ export default function socketHandler(socket) {
     if (room) {
       socket.join(room.id, () => {
         socket.emit('room', room) // to self
-        socket.to(room.id).emit('room', room) // to others
+        socket.to(room.id).emit('room', room) // to other members
+        socket.to(LOBBY_ROOM_ID).emit('rooms', Room.instances); // to lobby
       })
     }
   })
@@ -38,7 +49,8 @@ export default function socketHandler(socket) {
     const room = Room.leave({ user });
     if (room) {
       socket.leave(room.id, () => {
-        socket.to(room.id).emit('room', room);
+        socket.to(room.id).emit('room', room); // to other members
+        socket.to(LOBBY_ROOM_ID).emit('rooms', Room.instances); // to lobby
       })
     }
   };

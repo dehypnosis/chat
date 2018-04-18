@@ -21,7 +21,8 @@ export default class App extends React.Component {
         <Lobby
           user={state.user}
           rooms={state.rooms}
-          fetchRooms={socket.fetchRooms}
+          enterLobby={socket.enterLobby}
+          leaveLobby={socket.leaveLobby}
           createRoom={socket.createRoom}
           enterRoomById={id => socket.enterRoom({ id })}
         />

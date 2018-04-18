@@ -7,22 +7,17 @@ export default class Lobby extends React.Component {
   state = { loading: true, creatingRoom: false, roomTitle: null };
 
   componentDidMount() {
-    this.fetchRoomsInterval = setInterval(this.fetchRooms, 5000);
-    this.fetchRooms();
-  }
-
-  componentWillUnmount() {
-    if (this.fetchRoomsInterval) clearInterval(this.fetchRoomsInterval);
-  }
-
-  fetchRooms = () => {
-    this.props.fetchRooms()
-      .then(() => {
+    this.props.enterLobby()
+      .then(rooms => {
         this.setState(state => ({...state, loading: false}))
         if (this.props.rooms.length == 0) {
           this.roomTitleInputRef.focus();
         }
       })
+  }
+
+  componentWillUnmount() {
+    this.props.leaveLobby();
   }
 
   enterRoom = (room) => {

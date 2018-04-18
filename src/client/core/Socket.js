@@ -19,21 +19,30 @@ class Socket {
       this.io.once('logined', (userData) => {
         console.log('logined', userData);
         this.state.setUser(userData);
-        resolve();
+        resolve(this.state.user);
       })
     })
   }
 
-  fetchRooms = () => {
+  enterLobby = () => {
     return new Promise((resolve, reject) => {
-      console.log('fetchRooms')
-      this.io.emit('fetchRooms');
+      console.log('enterLobby');
+      this.io.emit('enterLobby');
 
-      this.io.once('rooms', (roomsData) => {
+      this.io.on('rooms', (roomsData) => {
         console.log('rooms', roomsData);
         this.state.setRooms(roomsData);
-        resolve();
+        resolve(this.state.rooms);
       })
+    })
+  }
+
+  leaveLobby = () => {
+    return new Promise((resolve, reject) => {
+      console.log('leaveLobby')
+      this.io.emit('leaveLobby');
+      this.io.off('rooms');
+      resolve();
     })
   }
 
@@ -45,6 +54,7 @@ class Socket {
       this.io.once('room', (roomData) => {
         console.log('createRoom -> room', roomData);
         this.state.createRoom(roomData);
+        resolve(this.state.activeRoom)
 
         this.io.on('room', (roomData) => {
           console.log('room', roomData);
@@ -63,6 +73,7 @@ class Socket {
         console.log('enterRoom -> room', roomData);
         this.state.setActiveRoomId(id);
         this.state.updateActiveRoom(roomData);
+        resolve(this.state.activeRoom)
 
         this.io.on('room', (roomData) => {
           console.log('room', roomData);
@@ -78,6 +89,7 @@ class Socket {
       this.io.emit('leaveRoom');
       this.io.off('room');
       this.state.setActiveRoomId(null);
+      resolve();
     })
   }
 }
