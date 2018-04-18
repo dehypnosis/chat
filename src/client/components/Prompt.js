@@ -31,9 +31,7 @@ export default class Prompt extends React.Component {
     this.setState(state => ({...state, loading: true }));
 
     // TODO: login as and set this.props.state.user
-    setTimeout(() => {
-      this.props.setUser({ id: 9999, nickname, avatarUrl });
-    }, 500);
+    this.props.login({ nickname, avatarUrl })
   }
 
   componentDidMount() {

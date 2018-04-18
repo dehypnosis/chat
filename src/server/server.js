@@ -43,7 +43,7 @@ app.use(logger('dev'));
 //Root
 app.get('*', function(req, res) {
   const initView = renderToString((
-    <App state={{}} />
+    <App state={{}} socket={{}} />
   ));
   const page = renderFullPage(initView);
   res.status(200).send(page);
@@ -60,6 +60,20 @@ process.on('uncaughtException', evt => {
   console.log('uncaughtException: ', evt);
 });
 
-app.listen(3000, function(){
+// Attach ws server and listen
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+
+server.listen(3000, function(){
   console.log('Listening on port 3000');
 });
+
+if (process.env.NODE_ENV != 'production') {
+  io.on('connection', function(...args) {
+    // Dynamically reload socket handler for fast deveolpment environment
+    delete require.cache[require.resolve('./socket')];
+    return require('./socket').default.apply(null, args);
+  });
+} else {
+  io.on('connection', require('./socket').default);
+}

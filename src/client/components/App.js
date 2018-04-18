@@ -7,12 +7,12 @@ import Room from './Room';
 @observer
 export default class App extends React.Component {
   render() {
-    const { state } = this.props;
+    const { state, socket } = this.props;
 
     if (!state.user) {
       return (
         <Prompt
-          setUser={state.setUser}
+          login={socket.login}
         />
       )
 
