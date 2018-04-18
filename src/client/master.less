@@ -1,0 +1,89 @@
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  overflow: hidden;
+  padding: 1em;
+  & > div {
+    height: calc(~"100vh - 2em");
+    overflow: hidden;
+  }
+}
+
+.avatar-selector {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  & > li {
+    flex: 1 1 auto;
+    align-self: center;
+    & > img {
+      width: 75%;
+      display: block !important;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+    &.active  > img {
+      width: 100%;
+      border: 2px solid #2284d1;
+    }
+  }
+}
+
+.ui.fluid > .content {
+  display: flex;
+  flex-direction: column;
+
+  .flex-vert {
+    flex: 1 1 auto;
+  }
+}
+
+.ui.feed .event .label {
+  margin-top: 0.5em;
+}
+
+.flex-vert {
+  display: flex;
+  flex-direction: column;
+
+  .flex-top {
+    flex: 1 1 auto;
+    overflow: auto;
+  }
+  .flex-bottom {
+    flex: 0 0 auto;
+    margin-top: 1em;
+  }
+}
+
+.flex-hori {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+
+  .flex-left {
+    flex: 3 3 auto;
+    overflow: auto;
+  }
+  .flex-right {
+    flex: 0 1 auto;
+    overflow: auto;
+    border-left: 1px solid #e0e1e2;
+    padding: 0 1em;
+    max-width: 150px;
+  }
+}
+
+.elipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

@@ -1,9 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import { Card, Header, Form, Button, Input, Image, Dimmer, Loader, Feed, List } from 'semantic-ui-react';
 
 @observer
 export default class Room extends React.Component {
-  state = { message: null, loading: true };
+  state = { message: null, loading: true, sending: false };
 
   componentDidMount() {
     // TODO: fetch room by this.props.roomId and update room data by this.props.update
@@ -16,21 +17,49 @@ export default class Room extends React.Component {
     }, 500);
   }
 
+  scrollMessagesContainerToBottom = () => {
+    // smooth scroll
+    if (this.messagesContainerRef.scrollIntoView) {
+      const lastMessageRef = this.messagesContainerRef.lastElementChild.lastElementChild;
+      if (lastMessageRef && lastMessageRef.scrollIntoView) {
+        lastMessageRef.scrollIntoView({behavior: 'smooth'})
+        return;
+      }
+    }
+
+    // fallback
+    this.messagesContainerRef.scrollTo(0, this.messagesContainerRef.scrollHeight);
+  }
+
   setMessage = (message) => {
     this.setState(state => ({...state, message}))
   }
 
   submit = (e) => {
     e.preventDefault();
+
+    if (this.state.sending) return;
+
+    const message = this.state.message && this.state.message.trim();
+    if (!message) return;
+
+    this.setState(state => ({...state, sending: true}));
+
     // TODO: send message to server
     setTimeout(() => {
       this.props.room.appendMessage({
         id: this.props.room.messages.length + 1000,
         user: JSON.parse(JSON.stringify(this.props.user)),
-        content: this.state.message,
+        content: message,
         at: parseInt((new Date).getTime()/1000),
       })
       this.setState(state => ({...state, message: null}))
+      this.scrollMessagesContainerToBottom();
+
+      // forbide too much talker
+      setTimeout(() => {
+        this.setState(state => ({...state, sending: false}))
+      }, 500)
     }, 200);
   }
 
@@ -38,45 +67,81 @@ export default class Room extends React.Component {
     const { room } = this.props;
 
     return (
-      <div className='chat-room'>
-        <h1>{this.state.loading && !room ? '불러오는 중...' : room && room.title }</h1>
-        <div className='chat-room-messages'>
-          <ul>
-            {room && room.messages.map(message => (
-              <li key={message.id}>
-                <span>
-                  <img src={message.user.avatarUrl} width={20} />
-                  <span>{message.user.nickname}</span>
-                  <small>{message.at.toLocaleString()}</small>
-                </span>
-                <p>{message.content}</p>
-              </li>
-            ))}
-            <li>
-              <form onSubmit={this.submit}>
-                <input
+      <Card fluid raised>
+        <Card.Content
+          header={
+            <Header
+              icon='comments'
+              style={{position: 'relative'}}
+              content={
+                !room ? '...' : (
+                  <div>
+                    <Button style={{position: 'absolute', right: '0'}} compact size='mini' onClick={this.props.exit}>나가기</Button>
+                    <span>{room.title}</span>
+                  </div>
+                )
+              }
+            />
+          }
+          description={
+            <Dimmer.Dimmable className='flex-vert'>
+              <Dimmer active={this.state.loading} inverted>
+                <Loader size='large' />
+              </Dimmer>
+
+              <div className='flex-top flex-hori'>
+                <div className='flex-left' ref={ref => this.messagesContainerRef = ref}>
+                  <Feed size='small'>
+                    {room && room.messages.map(message => (
+                      <Feed.Event
+                        key={message.id}
+                      >
+                        <Feed.Label image={message.user.avatarUrl} />
+                        <Feed.Content>
+                          <Feed.Summary>
+                            {message.user.nickname}
+                            <Feed.Date>{message.at.toLocaleString()}</Feed.Date>
+                          </Feed.Summary>
+                          <Feed.Extra text>{message.content}</Feed.Extra>
+                        </Feed.Content>
+                      </Feed.Event>
+                    ))}
+                  </Feed>
+                </div>
+
+                <div className='flex-right'>
+                  <Header size='small'>
+                    <span>{room ? room.users.length.toLocaleString() : 0}명 접속 중</span>
+                  </Header>
+                  <List>
+                    {room && room.users.map(user => (
+                      <List.Item key={user.id}>
+                        <div className='elipsis'>
+                          <Image avatar src={user.avatarUrl} width={20} />
+                          <span>{user.nickname}</span>
+                        </div>
+                      </List.Item>
+                    ))}
+                  </List>
+                </div>
+              </div>
+
+              <form onSubmit={this.submit} className='flex-bottom'>
+                <Input
+                  fluid
+                  action={{content: '보내기', color: 'blue', icon: 'send'}}
+                  size='large'
                   ref={ref => this.inputMessageInputRef = ref}
-                  type='text'
+                  placeholder='메세지를 입력하세요.'
                   value={this.state.message}
                   onChange={e => this.setMessage(e.target.value)}
                   disabled={this.state.loading}
                 />
               </form>
-            </li>
-          </ul>
-          <button onClick={this.props.exit}>나가기</button>
-        </div>
-        <div className='chat-room-users'>
-          <ul>
-            {room && room.users.map(user => (
-              <li key={user.id}>
-                <img src={user.avatarUrl} width={20} />
-                <span>{user.nickname}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+            </Dimmer.Dimmable>
+          }
+        />
+      </Card>
     )
   }
 }
